@@ -3,7 +3,11 @@
 ## Objectifs
 Cet outil en ligne de commande lance des requêtes HTTP vers un site web, contenant des charges (inoffensives), afin de vérifier si le site est correctement protégé par un pare-feu applicatif (WAF). 
 
-Pour chaque test (chaque requête), un résultat est attendu, sous la forme d'un ou plusieurs codes réponses HTTP. Si le serveur répond bien avec l'un de ces codes, le site est considéré protégé comme ce type d'attaque spécifique.
+Pour chaque test (chaque requête), un résultat est attendu, sous la forme d'un ou plusieurs codes réponses HTTP. Si le serveur répond bien avec l'un de ces codes, le site est consi
+
+## Pré-requis
+Requiert PHP >= 8.3 avec CURL.
+Non testé avec PHP < 8.3
 
 ## Utilisation
 TODO
