@@ -1,0 +1,17 @@
+{
+    "name": "realdev/waftest",
+    "description": "Web Application Firewall testing tool",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Realdev\\Waftest\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jean-Baptiste Romain",
+            "email": "jbromain25@gmail.com"
+        }
+    ],
+    "require": {}
+}
