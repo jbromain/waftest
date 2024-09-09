@@ -45,7 +45,6 @@ class TestDefinitions {
         return [
             'method' => 'GET',
             'expected' => [200],
-            'headers' => ['X-toto: 1'],
             'help' => "Ce test vérifie que la page d'accueil est accessible (IP du testeur non bloquée)"
         ];
     }

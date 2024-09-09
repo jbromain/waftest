@@ -1,4 +1,4 @@
-# WAF Test: outil de test de pare-feu applicatif (Wab Application Firewall)
+# WAF Test: outil de test de pare-feu applicatif (Web Application Firewall)
 
 ## Objectifs
 Cet outil en ligne de commande lance des requêtes HTTP vers un site web, contenant des charges (inoffensives), afin de vérifier si le site est correctement protégé par un pare-feu applicatif (WAF). 
