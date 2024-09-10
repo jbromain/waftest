@@ -10,9 +10,28 @@ Requiert PHP >= 8.3 avec CURL.
 Non testé avec PHP < 8.3
 
 ## Utilisation
-TODO
+### Installation
+```
+git clone https://github.com/jbromain/waftest.git
+cd waftest/
+composer install
+```
 
+### Exécution d'un test unique
+Le nom d'un test est le nom de la méthode qui le définit, dans la classe Realdev\Waftest\TestDefinitions.
+```
+php run-test.php https://www.google.fr t1_home_accessible
+```
 
+### Exécution successive de tous les tests
+```
+php run-test.php https://www.google.fr ALL
+```
+
+### Aide
+```
+php run-test.php
+```
 
 ## Clause de non-responsabilité
 Le logiciel est fourni "tel quel", sans garantie d'aucune sorte, expresse ou implicite. En aucun cas, les auteurs ou contributeurs ne pourront être tenus responsables de tout dommage, direct ou indirect, résultant de l'utilisation du logiciel. 
