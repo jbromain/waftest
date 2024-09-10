@@ -8,33 +8,37 @@ use Realdev\Waftest\MainTester;
 require 'vendor/autoload.php';
 
 if (PHP_SAPI != "cli") {
-    echo "Not in CLI";
+    echo "Not in CLI\n";
     exit;
 }
 
 
 if ($argc != 3) {
-    echo "USAGE:\n";
-    echo "  php run-test URL TESTNAME\n\n";
-    echo "WITH:\n";
-    echo "  URL = Homepage URL of the website you want to test (WITH protocol but WITHOUT trailing slash)\n";
-    echo "  TESTNAME = Name of the test to run (function name in the definition class). Use ALL to launch all the tests successively\n\n";
-    exit;
+    displayUsage();
+}
+$homeURL = trim($argv[1]);
+if(! str_starts_with($homeURL, 'http://') && ! str_starts_with($homeURL, 'https://')){
+    echo "Bad URL format\n\n";
+    displayUsage();
+}
+if(str_ends_with($homeURL, "/")){
+    echo "PLEASE READ THE DOCUMENTATION CAREFULLY:\n\n";
+    displayUsage();
 }
 
 
 $tester = new MainTester();
-$tester->setHomeURL($argv[1]);
+$tester->setHomeURL($homeURL);
 
 if($argv[2] !== 'ALL'){
     // Lancement d'un seul test
-    runOneTest($tester, $argv[1], $argv[2]);
+    runOneTest($tester, $homeURL, $argv[2]);
 
 } else {
     // Lancement successif de tous les tests
     $testNames = $tester->getAllTestNames();
     foreach ($testNames as $testName) {
-        runOneTest($tester, $argv[1], $testName);
+        runOneTest($tester, $homeURL, $testName);
     }
 }
 
@@ -56,4 +60,16 @@ function runOneTest(MainTester $tester, string $homeUrl, string $testName){
         else echo "failed silently";
         echo ")\n";
     }
+}
+
+/**
+ * Utilitaire; affiche comment utiliser le lanceur, et stoppe l'exécution.
+ */
+function displayUsage(){
+    echo "USAGE:\n";
+    echo "  php run-test URL TESTNAME\n\n";
+    echo "WITH:\n";
+    echo "  URL = Homepage URL of the website you want to test (WITH protocol but WITHOUT trailing slash)\n";
+    echo "  TESTNAME = Name of the test to run (function name in the definition class). Use ALL to launch all the tests successively\n\n";
+    exit;
 }
