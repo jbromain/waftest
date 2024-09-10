@@ -28,10 +28,24 @@ $tester->setHomeURL($argv[1]);
 
 if($argv[2] !== 'ALL'){
     // Lancement d'un seul test
+    runOneTest($tester, $argv[1], $argv[2]);
 
-    echo "Running test ".$argv[2]." on website ".$argv[1]."... ";
+} else {
+    // Lancement successif de tous les tests
+    $testNames = $tester->getAllTestNames();
+    foreach ($testNames as $testName) {
+        runOneTest($tester, $argv[1], $testName);
+    }
+}
 
-    $res = $tester->run($argv[2]);
+
+/**
+ * Utilitaire; lance un test et affiche le résultat sur la console.
+ */
+function runOneTest(MainTester $tester, string $homeUrl, string $testName){
+    echo "Running test $testName on website $homeUrl... ";
+
+    $res = $tester->run($testName);
     if($res['pass']){
         echo "PASS (http ".$res['http_status'].")\n";
     } else {
@@ -42,9 +56,4 @@ if($argv[2] !== 'ALL'){
         else echo "failed silently";
         echo ")\n";
     }
-
-
-} else {
-    // Lancement successif de tous les tests
-    // TODo
 }

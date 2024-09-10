@@ -154,6 +154,22 @@ class MainTester
         return self::$defaults;
     }
 
+    /**
+     * Retourne la liste de tous les noms de tests connus.
+     * Les tests sont retournés dans l'ordre alphabétique.
+     * 
+     * @return string[]
+     */
+    public function getAllTestNames(): array {
+        $res = get_class_methods($this->def);
+        $res = array_diff($res, [
+            'aaaaa1_documentation',
+            '__construct'
+        ]);
+        sort($res);
+        
+        return $res;
+    }
 
     /**
      * Merge les paramètres spécifiques d'un test avec les paramètres par défaut,
