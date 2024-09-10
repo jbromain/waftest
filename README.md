@@ -19,4 +19,4 @@ Le logiciel est fourni "tel quel", sans garantie d'aucune sorte, expresse ou imp
 
 Vous utilisez ce logiciel à vos propres risques et responsabilités. Il vous incombe de tester et d'évaluer sa compatibilité avec vos besoins et systèmes avant toute utilisation.
 
-L'utilisation de ce logiciel est strictement limitée à votre propre site.
+Ce logiciel est conçu pour les propriétaires de sites web, il n'est pas destiné à être utilisé pour mesurer le niveau de sécurité de sites tiers. Il vous incombe d'utiliser ce logiciel dans le respect de toutes les lois et règlements applicables.
