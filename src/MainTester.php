@@ -74,7 +74,7 @@ class MainTester
     /**
      * Lance une requête CURL pour exécuter un test avec les paramètres fournis.
      */
-    public function executeQuery(array $testParams){
+    private function executeQuery(array $testParams){
         $ch = curl_init($this->homeURL . $testParams['query']);
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
