@@ -29,6 +29,7 @@ class MainTester
             'pragma: no-cache',
             'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36'
         ],
+        'default_headers' => true,
         'expected' => [403, 405, 406],
         'help' => ''
     ];
@@ -90,6 +91,9 @@ class MainTester
             curl_setopt($ch, CURLOPT_POSTFIELDS, $testParams['data']);
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $testParams['headers']);
+
+        // Mode debug (très verbeux, affiche les headers échangés)
+        //curl_setopt($ch, CURLOPT_VERBOSE, true);
         
         $res = curl_exec($ch);
         if($res === false || curl_errno($ch) != 0){
@@ -111,6 +115,8 @@ class MainTester
             }
         } else {
             // Requête réussie du point de vue HTTP
+            //print($res);
+
             $status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             if(in_array($status, $testParams['expected'])){
                 // Réponse http conforme aux attentes
@@ -182,9 +188,14 @@ class MainTester
      */
     private function computeParameters(array $specific): array
     {
-        $res = self::$defaults;
+        $res = self::getDefaultsTestOptions();
         if (! is_array($specific)) {
             throw new Exception("Bad test definition - Not an array");
+        }
+
+        // Cas particulier: suppression des headers par défaut
+        if(isset($specific['default_headers']) && $specific['default_headers'] === false){
+            $res['headers'] = [];
         }
 
         foreach ($res as $key => $value) {
@@ -202,17 +213,18 @@ class MainTester
             }
         }
 
+        // Identifiants aléatoires dans les données POST
         while(($pos = strpos($res['data'], '{random_identifier}')) !== false){
             $random = bin2hex(random_bytes(5));
             $res['data'] = substr_replace($res['data'], $random, $pos, strlen('{random_identifier}'));
         }
 
+        // Identifiants aléatoires dans la query GET
         while(($pos = strpos($res['query'], '{random_identifier}')) !== false){
             $random = bin2hex(random_bytes(5));
             $res['query'] = substr_replace($res['query'], $random, $pos, strlen('{random_identifier}'));
         }
         
-
         return $res;
     }
 }

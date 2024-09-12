@@ -26,11 +26,17 @@ class TestDefinitions {
             // Timeout en ms, par défaut 3 secondes. Un timeout est considéré comme un échec du test
             'timeout' => 3000,
 
-            // En-têtes supplémentaires de la requête. Par défaut contient une série de headers permettant de se faire passer pour un navigateur
+            // En-têtes supplémentaires de la requête. 
+            // Par défaut contient une série de headers permettant de se faire passer pour un navigateur
             'headers' => [
                 'X-Toto: 1',
                 'Cookie: Yep=1;Yop=2'
             ],
+
+            // True pour que les headers User-Agent, Accept, Accept-language, et gestion du cache
+            // soient ajoutés automatiquement (cas général permettant d'imiter un navigateur)
+            // Indiquer false pour maîtriser la totalité des headers envoyés via le paramètre 'headers'
+            'default_headers' => true,
 
             // Codes de réponse HTTP signifiant que la protection est OK; par défaut 403 405 406
             'expected' => [403, 405, 406],
@@ -53,6 +59,14 @@ class TestDefinitions {
         return [
             'data' => '{random_identifier}=<?php 1;',
             'help' => "Ce test vérifie qu'on ne peut pas envoyer du PHP"
+        ];
+    }
+
+    public function t3_no_user_agent(): array {
+        return [
+            'default_headers' => false,
+            'method' => 'GET',
+            'help' => "Vérifie que les requêtes sans User-Agent sont rejetées"
         ];
     }
 }
