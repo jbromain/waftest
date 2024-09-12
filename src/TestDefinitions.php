@@ -11,6 +11,10 @@ namespace Realdev\Waftest;
 class TestDefinitions {
 
     public function aaaaa1_documentation(): array {
+        
+        // Le retour doit être un tableau, 
+        // mais TOUS les champs sont optionnels et ont une valeur par défaut
+
         return [
             // URL, vaut / par défaut
             // Si la chaine contient la séquence {random_identifier}, elle est remplacée par une chaine alphanumérique aléatoire
@@ -26,7 +30,7 @@ class TestDefinitions {
             // Timeout en ms, par défaut 3 secondes. Un timeout est considéré comme un échec du test
             'timeout' => 3000,
 
-            // En-têtes supplémentaires de la requête. 
+            // En-têtes SUPPLEMENTAIRES de la requête. 
             // Par défaut contient une série de headers permettant de se faire passer pour un navigateur
             'headers' => [
                 'X-Toto: 1',
