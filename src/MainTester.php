@@ -31,6 +31,7 @@ class MainTester
         ],
         'default_headers' => true,
         'expected' => [403, 405, 406],
+        'stop_on_failure' => false,
         'help' => ''
     ];
 
@@ -174,6 +175,42 @@ class MainTester
         ]);
         sort($res);
         
+        return $res;
+    }
+
+    /**
+     * Retourne s'il existe un test portant le nom indiqué.
+     * 
+     * @param string $testName Nom du test
+     * @return bool Vrai si le test existe
+     */
+    public function testExists(string $testName): bool {
+        return in_array($testName, $this->getAllTestNames());
+    }
+
+    /**
+     * Retourne un tableau descriptif des tests, d'un point de vue fonctionnel.
+     * Destiné à l'affichage. Les tests sont retournés dans l'ordre d'exécution recommandée.
+     * Chaque entrée du tableau contient un test sous cette forme:
+     * [
+     *   name => Nom du test
+     *   help => Description si présente, peut contenir du HTML
+     *   stop_on_failure => true si l'audit doit être stoppé si ce test échoue, false sinon
+     * ]
+     * 
+     */
+    public function getTestsDefinitions(): array {
+        $res = [];
+        $testNames = $this->getAllTestNames();
+        foreach ($testNames as $name) {
+            $testParams = $this->computeParameters($this->def->$name());
+            $myTest = [
+                'name' => $name,
+                'help' => $testParams['help'],
+                'stop_on_failure' => $testParams['stop_on_failure']
+            ];
+            $res[] = $myTest;
+        }
         return $res;
     }
 

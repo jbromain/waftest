@@ -6,7 +6,7 @@ namespace Realdev\Waftest;
  * Définition des tests qui seront lancés par le moteur.
  * L'identifiant du test = son nom = le nom de la méthode.
  * 
- * Voir exemple.
+ * Voir exemple aaaaa1_documentation pour les détails.
  */
 class TestDefinitions {
 
@@ -45,28 +45,33 @@ class TestDefinitions {
             // Codes de réponse HTTP signifiant que la protection est OK; par défaut 403 405 406
             'expected' => [403, 405, 406],
 
+            // True pour interrompre l'audit si ce test échoue
+            // (Conçu pour détecter les blocages IP: si un GET / échoue, inutile d'aller plus loin)
+            'stop_on_failure' => false,
+
             // Description et conseils associés à ce test, html autorisé; vide par défaut
             'help' => ''
         ];
     }
 
 
-    public function t1_home_accessible(): array {
+    public function t001_home_accessible(): array {
         return [
             'method' => 'GET',
             'expected' => [200],
-            'help' => "Ce test vérifie que la page d'accueil est accessible (IP du testeur non bloquée)"
+            'help' => "Ce test vérifie que la page d'accueil est accessible (IP du testeur non bloquée)",
+            'stop_on_failure' => true
         ];
     }
 
-    public function t2_php_injection(): array {
+    public function t002_php_injection(): array {
         return [
             'data' => '{random_identifier}=<?php 1;',
             'help' => "Ce test vérifie qu'on ne peut pas envoyer du PHP"
         ];
     }
 
-    public function t3_no_user_agent(): array {
+    public function t003_no_user_agent(): array {
         return [
             'default_headers' => false,
             'method' => 'GET',
