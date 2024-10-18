@@ -20,7 +20,7 @@ composer install
 ### Exécution d'un test unique
 Le nom d'un test est le nom de la méthode qui le définit, dans la classe Realdev\Waftest\TestDefinitions.
 ```
-php run-test.php https://www.google.fr t1_home_accessible
+php run-test.php https://www.google.fr t001_home_accessible
 ```
 
 ### Exécution successive de tous les tests
