@@ -10,6 +10,9 @@ namespace Realdev\Waftest;
  */
 class TestDefinitions {
 
+    /**
+     * Exemple. Ce test n'est pas réellement exécuté lors de l'audit.
+     */
     public function aaaaa1_documentation(): array {
         
         // Le retour doit être un tableau, 
@@ -55,11 +58,15 @@ class TestDefinitions {
     }
 
 
-    public function t001_home_accessible(): array {
+    /**
+     * Test témoin effectué en premier. En cas d'échec, les résultats de l'audit sont invalidés.
+     * (Blocage IDS)
+     */
+    public function t001_control(): array {
         return [
             'method' => 'GET',
             'expected' => [200],
-            'help' => "Ce test vérifie que la page d'accueil est accessible (IP du testeur non bloquée)",
+            'help' => "Test témoin, vérifie l'absence de blocage IDS",
             'stop_on_failure' => true
         ];
     }
@@ -76,6 +83,19 @@ class TestDefinitions {
             'default_headers' => false,
             'method' => 'GET',
             'help' => "Vérifie que les requêtes sans User-Agent sont rejetées"
+        ];
+    }
+
+    /**
+     * Test témoin effectué en dernier. En cas d'échec, les résultats de l'audit sont invalidés.
+     * (Blocage IDS)
+     */
+    public function t999_control(): array {
+        return [
+            'method' => 'GET',
+            'expected' => [200],
+            'help' => "Test témoin, vérifie l'absence de blocage IDS",
+            'stop_on_failure' => true
         ];
     }
 }
