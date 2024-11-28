@@ -4,7 +4,7 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-            "Realdev\\Waftest\\": "src/"
+            "Touchweb\\Waftest\\": "src/"
         }
     },
     "authors": [

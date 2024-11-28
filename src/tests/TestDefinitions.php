@@ -1,6 +1,6 @@
 <?php 
 
-namespace Realdev\Waftest;
+namespace Touchweb\Waftest\tests;
 
 /**
  * Définition des tests qui seront lancés par le moteur.

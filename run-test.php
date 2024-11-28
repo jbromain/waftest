@@ -4,7 +4,7 @@
  * Lanceur CLI
  */
 
-use Realdev\Waftest\MainTester;
+use Touchweb\Waftest\MainTester;
 require 'vendor/autoload.php';
 
 if (PHP_SAPI != "cli") {
@@ -67,9 +67,9 @@ function runOneTest(MainTester $tester, string $homeUrl, string $testName){
  */
 function displayUsage(){
     echo "USAGE:\n";
-    echo "  php run-test URL TESTNAME\n\n";
+    echo "  php run-test URL TESTCLASS-TESTNAME\n\n";
     echo "WITH:\n";
     echo "  URL = Homepage URL of the website you want to test (WITH protocol but WITHOUT trailing slash)\n";
-    echo "  TESTNAME = Name of the test to run (function name in the definition class). Use ALL to launch all the tests successively\n\n";
+    echo "  TESTCLASS-TESTNAME = Name of the test to run (class name followed by function name in the definition class). Use ALL to launch all the tests successively\n\n";
     exit;
 }

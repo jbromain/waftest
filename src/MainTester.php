@@ -1,10 +1,12 @@
 <?php
 
-namespace Realdev\Waftest;
+namespace Touchweb\Waftest;
 
 use Exception;
 use InvalidArgumentException;
 use LogicException;
+use Touchweb\Waftest\tests\CWE89;
+use Touchweb\Waftest\tests\TestDefinitions;
 
 /**
  * Classe principale, permet de lancer un test et de retourner le résultat.
@@ -47,15 +49,25 @@ class MainTester
      */
     private string $homeURL;
 
-    private TestDefinitions $def;
+    /**
+     * Définition des classes de tests, les tests seront exécutés dans l'ordre.
+     * Instancié à la construction de la classe.
+     * 
+     * Clé = nom de la classe, sans le namespace
+     * Valeur = instance de la classe
+     */
+    private array $testsDefinitions;
 
     public function __construct()
     {
-        $this->def =  new TestDefinitions();
+        $this->testsDefinitions = [
+            'TestDefinitions' => new TestDefinitions(),
+            'CWE89' => new CWE89()
+        ];
     }
 
     /**
-     * Lance le test dont le nom est fourni (doit correspondre à une méthode de la classe TestDefinitions).
+     * Lance le test dont le nom est fourni.
      * Déclenche une exception si le nom du test n'existe pas, ou que l'url du site n'a pas été préalablement configurée.
      * Retourne le résultat du test, sous la forme d'un tableau
      * [
@@ -64,10 +76,22 @@ class MainTester
      *   'timeout' => boolean,
      *   'error_msg' => ?string
      * ]
+     * 
+     * @param string $testFullName Nom du test à lancer, sous la forme CLASSE-METHODE. Exemple: CWE89-t001_sqli
      */
-    public function run(string $testName): array
+    public function run(string $testFullName): array
     {
-        if (! method_exists(TestDefinitions::class, $testName)) {
+        // Décomposition du nom du test
+        if(strpos($testFullName, '-') === false){
+            throw new InvalidArgumentException("Bad test name format: $testFullName. Exptected: CLASS-METHOD. Example: CWE89-t001_sqli");
+        }
+        list($testClassName, $testName) = explode('-', $testFullName);
+        
+        if(! isset($this->testsDefinitions[$testClassName])){
+            throw new InvalidArgumentException("Test class does not exist: $testClassName");
+        }
+        
+        if (! method_exists($this->testsDefinitions[$testClassName], $testName)) {
             throw new InvalidArgumentException("Test does not exist: $testName");
         }
 
@@ -75,7 +99,7 @@ class MainTester
             throw new LogicException("You must specify website URL first");
         }
 
-        $testParams = $this->computeParameters($this->def->$testName());
+        $testParams = $this->computeParameters($this->testsDefinitions[$testClassName]->$testName());
 
         return $this->executeQuery($testParams);
     }
@@ -170,18 +194,44 @@ class MainTester
 
     /**
      * Retourne la liste de tous les noms de tests connus.
-     * Les tests sont retournés dans l'ordre alphabétique.
+     * Les tests sont retournés dans l'ordre de déclaration des classes de tests, puis dans l'ordre
+     * alphabétique des noms de tests au sein d'une classe.
+     * 
+     * Le format des CLASSE-METHODE. Exemple: CWE89-t001_sqli
      * 
      * @return string[]
      */
     public function getAllTestNames(): array {
-        $res = get_class_methods($this->def);
+        // On parcourt les instances des classes de tests
+        $res = [];
+        foreach($this->testsDefinitions as $className => $def){
+            $res = array_merge($res, $this->getAllTestNamesFromClass($def));
+        }
+
+        return $res;
+    }
+
+    /**
+     * Retournes les noms de tests d'une classe donnée.
+     * Le résultat est sous la forme d'un tableau dont chaque élément est
+     * le nom d'un test. 
+     * 
+     * Le nom d'un test est sous la forme CLASSE-METHODE. Exemple: CWE89-t001_sqli
+     * Le nom de la classe ne contient pas le namespace.
+     */
+    private function getAllTestNamesFromClass($def): array {
+        $res = get_class_methods($def);
         $res = array_diff($res, [
-            'aaaaa1_documentation',
-            '__construct'
+            '__construct',
+            'aaaaa1_documentation'
         ]);
         sort($res);
-        
+
+        // Nom de la classe sans le namespace
+        $className = array_search($def, $this->testsDefinitions);
+        $res = array_map(function($name) use ($className){
+            return $className . '-' . $name;
+        }, $res);
         return $res;
     }
 
@@ -200,7 +250,7 @@ class MainTester
      * Destiné à l'affichage. Les tests sont retournés dans l'ordre d'exécution recommandée.
      * Chaque entrée du tableau contient un test sous cette forme:
      * [
-     *   name => Nom du test
+     *   name => Nom du test, sous la forme CLASSES-METHODE. Exemple: CWE89-t001_sqli
      *   help => Description si présente, peut contenir du HTML
      *   stop_on_failure => true si l'audit doit être stoppé si ce test échoue, false sinon
      * ]
@@ -210,7 +260,10 @@ class MainTester
         $res = [];
         $testNames = $this->getAllTestNames();
         foreach ($testNames as $name) {
-            $testParams = $this->computeParameters($this->def->$name());
+            list($className, $methodName) = explode('-', $name);
+            $def = $this->testsDefinitions[$className];
+
+            $testParams = $this->computeParameters($def->$methodName());
             $myTest = [
                 'name' => $name,
                 'help' => $testParams['help'],
@@ -258,17 +311,50 @@ class MainTester
         }
 
         // Identifiants aléatoires dans les données POST
+        // TODO améliorer la chaine aléatoire pour que ça ait l'air francais
+        // max 2 consonnes à la suite, max 3 voyelles à la suite
+        $random = '';
+
+
         while(($pos = strpos($res['data'], '{random_identifier}')) !== false){
-            $random = bin2hex(random_bytes(5));
+            $random = $this->generateRandomIdentifier();
             $res['data'] = substr_replace($res['data'], $random, $pos, strlen('{random_identifier}'));
         }
 
         // Identifiants aléatoires dans la query GET
         while(($pos = strpos($res['query'], '{random_identifier}')) !== false){
-            $random = bin2hex(random_bytes(5));
+            $random = $this->generateRandomIdentifier();
             $res['query'] = substr_replace($res['query'], $random, $pos, strlen('{random_identifier}'));
         }
         
+        return $res;
+    }
+
+    /**
+     * Génère un identifiant aléatoire de 2 à 10 caractères alphabétiques,
+     * avec au max 2 consommes consécutives et 3 voyelles consécutives.
+     * 
+     * @return string Identifiant aléatoire
+     */
+    private function generateRandomIdentifier(): string {
+        $consonnes = 'bcdfghjklmnpqrstvwxz';
+        $voyelles = 'aeiouy';
+        $res = '';
+        $nb = random_int(2, 10);
+        $voyelle = random_int(0, 1) === 0;
+        for($i = 0; $i < $nb; $i++){
+            if($voyelle){
+                $res .= $voyelles[random_int(0, strlen($voyelles) - 1)];
+                if(random_int(0, 2) === 0){
+                    $voyelle = false;
+                }
+            } else {
+                $res .= $consonnes[random_int(0, strlen($consonnes) - 1)];
+                if(random_int(0, 1) === 0){
+                    $voyelle = true;
+                }
+            }
+        }
         return $res;
     }
 }
